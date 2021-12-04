@@ -1,38 +1,65 @@
-.App {
-  text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.navbar {
+  animation: navbardropdown 1s forwards;
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 0px 0px 30px 30px;
+  background: linear-gradient(-135deg, #468BB7, #61CE89);
+  padding: 20px 0px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 70px;
+}
+.navbar input {
+  transition: 0.5s all ease-out;
+
+  width: 30%;
+  border: none;
+  font-size: larger;
+  padding: 10px 30px;
+  border-radius: 20px;
+  color: rgb(110, 110, 110);
+  font-family: "Open Sans", sans-serif;
+}
+.navbar button {
+  width: 5%;
+  padding: 10px 0;
+  background-color: transparent;
+  border: none;
+  transition: 0.5s all ease-out;
+  border-radius: 30px;
+}
+.navbar button img {
+  width: 30%;
+}
+.navbar input:focus {
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.5s all ease-out;
+}
+.navbar button:active {
+  transition: 0.5s all ease-out;
+}
+@keyframes navbardropdown {
+  0% {
+    transform: translateY(-40px);
+  }
+  100% {
+    transform: translateY(0px);
+    
+  }
+}
+.linkbar a  {
+  text-decoration: none;
+  font-size: large;
   color: white;
-}
 
-.App-link {
-  color: #61dafb;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.linkbar a:hover{
+  cursor: pointer;
+}
+.linkbar {
+   justify-content: space-evenly;
+   font-weight: 600;
+   margin-left: 10px;
 }
