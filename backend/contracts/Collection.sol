@@ -1,61 +1,39 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity ^0.8.4;
-
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "./NFT.sol";
 
-contract Collection is ERC721Enumerable, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-    uint public MAX_SUPPLY;
-    uint public constant PRICE = 0.01 ether;
-    string public baseTokenURI; 
-    address payable _owner;
+import "hardhat/console.sol";
 
 
+contract Collection is NFT , Ownable{
 
-    constructor( uint maxSupply,string memory baseURI, address owner, string memory _name, string memory _symbol) ERC721(_name, _symbol) {
-     _owner = payable(owner);
-     MAX_SUPPLY = maxSupply;
-     setBaseURI(baseURI);
-}
+   // Mapping from owner to list of owned token IDs
+    // mapping(address => mapping(uint256 => uint256)) private _ownedTokens;
+
+    // // Mapping from token ID to index of the owner tokens list
+    // mapping(uint256 => uint256) private _ownedTokensIndex;
+
+    // // Array with all token ids, used for enumeration
+    // uint256[] private _allTokens;
+
+    // // Mapping from token id to position in the allTokens array
+    // mapping(uint256 => uint256) private _allTokensIndex;
 
 
-function _baseURI() internal 
-                    view 
-                    virtual 
-                    override 
-                    returns (string memory) {
-     return baseTokenURI;
-}
-function setBaseURI(string memory _baseTokenURI) public onlyOwner {
-     baseTokenURI = _baseTokenURI;
-}
+    constructor(address marketplaceAddress,
+    string memory name,
+    string memory symbol,
+    string memory baseURI_,address newOwner) NFT(marketplaceAddress,name,symbol,baseURI_){
+        transferOwnership(newOwner);
+    }
 
-function mintNFTs(uint _count) public payable {
-     uint totalMinted = _tokenIds.current();
-     require(
-       totalMinted + _count <= MAX_SUPPLY, "Not enough NFTs!"
-     );
-     require(
-       msg.value >= PRICE * _count, 
-       "Not enough ether to purchase NFTs."
-     );
-     for (uint i = 0; i < _count; i++) {
-       uint newTokenID = _tokenIds.current();
-      _safeMint(msg.sender, newTokenID);
-      _tokenIds.increment();
-     }
-}
-
-function withdraw() public payable onlyOwner {
-     uint balance = address(this).balance;
-     require(balance > 0, "No ether left to withdraw");
-     (bool success, ) = (msg.sender).call{value: balance}("");
-     require(success, "Transfer failed.");
-}
+    function createToken(string memory tokenURI) public override onlyOwner returns (uint) {  
+    //    _ownedTokens[_msgSender()]
+       return super.createToken(tokenURI);
+    }
 
 }

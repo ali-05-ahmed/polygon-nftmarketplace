@@ -4,25 +4,25 @@ const fs = require('fs');
 // const infuraId = fs.readFileSync(".infuraid").toString().trim() || "";
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "mumbai",
   networks: {
-    hardhat: {
-      chainId: 1337
-    },
-    /*
+    // hardhat: {
+    //   chainId: 1337
+    // },
+    
     mumbai: {
       // Infura
       // url: `https://polygon-mumbai.infura.io/v3/${infuraId}`
-      url: "https://rpc-mumbai.matic.today",
-      accounts: [privateKey]
+      url: "https://polygon-mumbai.infura.io/v3/89aa0cf029e948ee883b0bf906f2f3df",
+      accounts: ['f57ab03cd909f705be55a445785bd98429c48222b0a01bbb06a188353eeb55f2']
     },
-    matic: {
-      // Infura
-      // url: `https://polygon-mainnet.infura.io/v3/${infuraId}`,
-      url: "https://rpc-mainnet.maticvigil.com",
-      accounts: [privateKey]
-    }
-    */
+    // matic: {
+    //   // Infura
+    //   // url: `https://polygon-mainnet.infura.io/v3/${infuraId}`,
+    //   url: "https://rpc-mainnet.maticvigil.com",
+    //   accounts: [privateKey]
+    // }
+    
   },
   solidity: {
     version: "0.8.4",
@@ -39,4 +39,7 @@ module.exports = {
     cache: "./cache",
     artifacts: "../frontend/src/artifacts"
   },
+  mocha: {
+    timeout: 200000
+  }
 };

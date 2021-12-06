@@ -1,6 +1,6 @@
 import React from "react";
 import usericon from "../assets/user.png";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -13,20 +13,48 @@ const Navbar = () => {
           alignItems: "center",
         }}
       >
-        <div style={{ display: "flex", width: "30%" }} className="linkbar">
-          <Link to="/collections">
-            <a>Collections</a>
-          </Link>
+        <div style={{ display: "flex", width: "50%" }} className="linkbar">
+          <NavLink
+            className={({ isActive }) => (isActive ? "active" : "inactive")}
+            to="/"
+          >
+            <a>MarketPlace</a>
+          </NavLink>
 
-          <Link to="/my-assets">
-            <a>NFTs</a>
-          </Link>
-          <Link to="/create-item">
-            <a>Create</a>
-          </Link>
-          <Link to="/creator-dashboard">
-            <a>Dashboard</a>
-          </Link>
+          <NavLink
+            className={({ isActive }) => (isActive ? "active" : "inactive")}
+            to="/my-assets"
+          >
+            <a>My Assets</a>
+          </NavLink>
+
+          <div class="dropdown">
+            <span>Create</span>
+            <div class="dropdown-content">
+              <NavLink
+                className={({ isActive }) => (isActive ? "active" : "inactive")}
+                to="/create-item"
+              >
+                NFTs
+              </NavLink>
+              <NavLink
+                className={({ isActive }) => (isActive ? "active" : "inactive")}
+                to="/create-collection"
+              >
+                Collections
+              </NavLink>
+            </div>
+          </div>
+
+          <NavLink to="/creator-dashboard">
+            <a>Created Assets</a>
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? "active" : "inactive")}
+            to="/auctions"
+          >
+            <a>Auctions</a>
+          </NavLink>
         </div>
         <div style={{ width: "5%" }}>
           <img style={{ width: "45%" }} src={usericon} alt="" />

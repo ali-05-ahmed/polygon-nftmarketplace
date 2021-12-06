@@ -1,24 +1,28 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "hardhat/console.sol";
-import "./Collection.sol";
+import "./AuctionV1.sol";
 
-contract NFTMarket is ReentrancyGuard {
+
+contract Market is ReentrancyGuard {
+
   using Counters for Counters.Counter;
   Counters.Counter private _itemIds;
   Counters.Counter private _itemsSold;
   address payable owner;
   uint256 listingPrice = 0.025 ether;
+  AuctionV1 auction ;
 
   constructor() {
     owner = payable(msg.sender);
+    auction = new AuctionV1();
   }
 
   struct MarketItem {
+
     uint itemId;
     address nftContract;
     uint256 tokenId;
@@ -26,21 +30,14 @@ contract NFTMarket is ReentrancyGuard {
     address payable owner;
     uint256 price;
     bool sold;
+    bool isAuction;
+
   }
 
   mapping(uint256 => MarketItem) private idToMarketItem;
 
-  mapping(address => Collection) _collection;
+  
 
-  function createCollection(uint maxSupply,
-         string memory baseURI,
-          address _owner,
-           string memory _name, 
-           string memory _symbol) public {
-        _collection[msg.sender] = new Collection(maxSupply, baseURI, _owner, _name, _symbol);
-
-    
-    }
 
   event MarketItemCreated (
     uint indexed itemId,
@@ -52,6 +49,10 @@ contract NFTMarket is ReentrancyGuard {
     bool sold
   );
 
+  function auction_addr() public view returns(address){
+    return address(auction);
+  }
+
   /* Returns the listing price of the contract */
   function getListingPrice() public view returns (uint256) {
     return listingPrice;
@@ -61,10 +62,13 @@ contract NFTMarket is ReentrancyGuard {
   function createMarketItem(
     address nftContract,
     uint256 tokenId,
-    uint256 price
+    uint256 price,
+    bool _isAuction,
+    uint256 _endingUnix
   ) public payable nonReentrant {
     require(price > 0, "Price must be at least 1 wei");
-    require(msg.value == listingPrice, "Price must be equal to listing price");
+    if(_isAuction)
+    auction.createAuction(price,_endingUnix,nftContract,tokenId, msg.sender);
 
     _itemIds.increment();
     uint256 itemId = _itemIds.current();
@@ -76,7 +80,8 @@ contract NFTMarket is ReentrancyGuard {
       payable(msg.sender),
       payable(address(0)),
       price,
-      false
+      false,
+      _isAuction
     );
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
@@ -98,6 +103,21 @@ contract NFTMarket is ReentrancyGuard {
     address nftContract,
     uint256 itemId
     ) public payable nonReentrant {
+      MarketItem memory marketitem = idToMarketItem[itemId];
+    if(marketitem.isAuction){
+     require(auction.canSell(nftContract,marketitem.tokenId)==true,"this Auction is in progress");
+     uint256 tokenId = marketitem.tokenId;
+     address buyer = auction.getHighestBidder(nftContract,marketitem.tokenId);
+     auction.concludeAuction(tokenId,nftContract,msg.sender);
+
+    IERC721(nftContract).transferFrom(address(this), buyer , tokenId);
+    idToMarketItem[itemId].owner = payable(msg.sender);
+    idToMarketItem[itemId].sold = true;
+    _itemsSold.increment();
+
+    }
+    else {
+
     uint price = idToMarketItem[itemId].price;
     uint tokenId = idToMarketItem[itemId].tokenId;
     require(msg.value == price, "Please submit the asking price in order to complete the purchase");
@@ -107,7 +127,8 @@ contract NFTMarket is ReentrancyGuard {
     idToMarketItem[itemId].owner = payable(msg.sender);
     idToMarketItem[itemId].sold = true;
     _itemsSold.increment();
-    payable(owner).transfer(listingPrice);
+  
+    }
   }
 
   /* Returns all unsold market items */
@@ -179,4 +200,5 @@ contract NFTMarket is ReentrancyGuard {
 
 
 }
+
 
